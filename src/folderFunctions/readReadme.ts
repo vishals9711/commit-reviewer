@@ -10,7 +10,6 @@ async function readReadmeFile() {
 				}
 			});
 		});
-		console.log("README.md found and read");
 		return readme;
 	} catch (error) {
 		console.error("Error reading README.md file:", error);

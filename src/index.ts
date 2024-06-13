@@ -1,54 +1,39 @@
 import { Command } from "commander";
 import cowsay from "cowsay";
-import simpleGit from "simple-git";
-import { generateFolderStructureFromGit, getCommitHistory, getStagedChangesDiff } from "./folderFunctions/gitUtils";
+import { generateFolderStructureFromGit, getStagedChangesDiff } from "./folderFunctions/gitUtils";
 import readReadmeFile from "./folderFunctions/readReadme";
-import { generatePrompt, generatePromptMessages } from "./llmfunctions";
+import { runPrompt } from "./llmfunctions";
 
 const program = new Command();
 
 console.log(
 	cowsay.say({
-		text: "Commit Message Generator",
+		text: "Search your commits, you know it to be true",
+		f:"vader"
 	}),
 );
 
 program
 	.version("1.0.0")
-	.description("CLI tool for generating commit messages")
-	.option("-g, --generate", "Generate a commit message")
+	.description("CLI tool for reviewing code")
 	.parse(process.argv);
 
 const options = program.opts();
-const git = simpleGit();
-console.log("Options:", options);
 
-if (options.generate) {
-	console.log("Generate option selected");
-	generateCommitMessage();
-} else {
-	console.log("Generate option not selected");
-}
+console.log("Reviewing staged changes");
+generateReviewMessage();
 
-async function generateCommitMessage() {
+async function generateReviewMessage() {
 	try {
 		const readme = await readReadmeFile();
-
-		const commits = await getCommitHistory();
-
 		const diff = await getStagedChangesDiff();
-
 		const folderStructure = await generateFolderStructureFromGit();
-		console.log("Folder structure:", folderStructure);
-		const prompt = generatePrompt(readme, commits, folderStructure);
 
-    	const messages = generatePromptMessages(prompt, diff);
+		const response = await runPrompt(readme, folderStructure, diff);
 
-		const response = await makeApiCall(messages);
-
-		console.log("Generated Commit Message:\n\n ==========================\n", response);
+		console.log("Generated Message:\n\n", response);
 	} catch (error) {
-		console.error("Error generating commit message:", error);
+		console.error("Error generating message:", error);
 	}
 }
 
@@ -64,12 +49,12 @@ async function makeApiCall(messages: { role: string; content: string }[]) {
 			body: JSON.stringify({
 				model: "SanctumAI/Meta-Llama-3-8B-Instruct-GGUF",
 				messages,
-				temperature: 0.2,
-				max_tokens: -1,
-				format: "json",
+				temperature: 0.5,
+				max_tokens: 200,
 			}),
 		});
 		const data = await response.json();
+		console.log(data);
 		return data.choices[0].message.content.trim();
 	} catch (error) {
 		console.error("Error making API call:", error);
