@@ -1,64 +1,66 @@
-import { Ollama } from "@langchain/community/llms/ollama";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import PROMPT_KNOWLEDGE_BASED from "./comments";
+const ollama = new ChatOllama({
+  baseUrl: "http://localhost:11434", // Default value
+  model: "llama3", // Default value
+});
 
-const ollama = new Ollama({
-    baseUrl: "http://localhost:11434", // Default value
-    model: "llama3", // Default value
-  });
-  
+const parser = new StringOutputParser();
 
-  async function runPrompt(prompt: {
-    role: string;
-    content: string;
-}[]) {
-    const response = await ollama.generate(prompt.map((p) => p.content));
-    console.log(response)
-    return "response.generations"
-}
 
-export const generatePrompt = (readme:string, commits:string, folderStructure:string) => {
-  return `
-You are an AI specialized in writing Git commit messages. You will receive information about the folder structure, commit history, and README file of a repository. Based on this information, you will generate concise and descriptive commit messages.
+const KNOWLEDGE_PROMPT = `Here is the consolidated information from the Reddit thread on conducting a code review, formatted as a comprehensive guide:
+${PROMPT_KNOWLEDGE_BASED}
+`;
+
+
+const PROMPT_V1 = 
+  `
+You are a code reviewer. You are tasked with reviewing a codebase and providing feedback on its quality, maintainability, and adherence to coding standards.
 
 ### Instructions:
 1. **Folder Structure:** The hierarchical structure of files and directories within the repository.
-2. **Commit History:** A list of previous commit messages, including their contents and timestamps.
 3. **README File:** The contents of the README file, providing context about the project's purpose and key functionalities.
-
-### Rules:
-- In each subsequent interaction, you will receive a diff of changes made to the repository.
-- Your task is to generate an appropriate commit message based on the provided diff and the initial context (folder structure, commit history, README file).
-- The response should be a single commit message, concise and relevant to the changes made.
 
 ### Context:
 **Folder Structure:**
 \`\`\`
-${folderStructure}
-\`\`\`
-
-**Commit History:**
-\`\`\`
-${commits}
+{folderStructure}
 \`\`\`
 
 **README File:**
 \`\`\`
-${readme}
-\`\`\`
-  Only return the commit message and nothing else.`
+{readme}
+\`\`\``;
+
+const prompt = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    KNOWLEDGE_PROMPT
+  ],
+  [
+    "system",
+    PROMPT_V1
+  ],
+  ["human", `Here is the diff of changes made to the repository:\n{diff}`],
+]);
+
+
+const generatePrompt = async (readme:string, folderStructure:string) => {
+  const partialPrompt = await prompt.partial({
+    folderStructure,
+    readme
+  });
+  return partialPrompt;
 };
 
-
-
-
-    export const generatePromptMessages = (prompt: string,diff: string) => {
-      const messages = [{
-        role: 'system',
-        content: prompt,
-      },
-      {
-        role: 'user',
-        content: `${diff}`,
-      },]
-    return messages;
-  };
-export default runPrompt
+export const runPrompt = async (readme:string, folderStructure:string,diff: string) => {
+  const partialPrompt = await generatePrompt(
+    readme,
+    folderStructure
+  )
+  const chain = partialPrompt.pipe(ollama).pipe(parser);
+  const response = await chain.invoke({ diff });
+  return response;
+};
