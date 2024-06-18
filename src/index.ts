@@ -1,8 +1,6 @@
 import { Command } from "commander";
 import cowsay from "cowsay";
-import { generateFolderStructureFromGit, getStagedChangesDiff } from "./folderFunctions/gitUtils";
-import readReadmeFile from "./folderFunctions/readReadme";
-import { runPrompt } from "./llmfunctions";
+import generateReviewMessage from "./llmfunctions";
 
 const program = new Command();
 
@@ -16,48 +14,15 @@ console.log(
 program
 	.version("1.0.0")
 	.description("CLI tool for reviewing code")
+	.option('-b, --branch <branch>', 'Add branch name to compare current branch with')
 	.parse(process.argv);
 
+// TODO: Add more options
+// Add -b to add branch name to compare current branch with
 const options = program.opts();
 
-console.log("Reviewing staged changes");
-generateReviewMessage();
+const {branch} = options;
 
-async function generateReviewMessage() {
-	try {
-		const readme = await readReadmeFile();
-		const diff = await getStagedChangesDiff();
-		const folderStructure = await generateFolderStructureFromGit();
+console.log("Reviewing code in branch", branch);
+generateReviewMessage(branch);
 
-		const response = await runPrompt(readme, folderStructure, diff);
-
-		console.log("Generated Message:\n\n", response);
-	} catch (error) {
-		console.error("Error generating message:", error);
-	}
-}
-
-async function makeApiCall(messages: { role: string; content: string }[]) {
-	try {
-		console.log("Making API call to Llama-2-7B-Chat-GGUF model");
-
-		const response = await fetch("http://localhost:7001/v1/chat/completions", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				model: "SanctumAI/Meta-Llama-3-8B-Instruct-GGUF",
-				messages,
-				temperature: 0.5,
-				max_tokens: 200,
-			}),
-		});
-		const data = await response.json();
-		console.log(data);
-		return data.choices[0].message.content.trim();
-	} catch (error) {
-		console.error("Error making API call:", error);
-		return null;
-	}
-}

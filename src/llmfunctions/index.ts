@@ -2,6 +2,8 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatOllama } from "@langchain/community/chat_models/ollama";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import PROMPT_KNOWLEDGE_BASED from "./comments";
+import readReadmeFile from "../folderFunctions/readReadme";
+import { getStagedChangesDiff, generateFolderStructureFromGit } from "../folderFunctions/gitUtils";
 const ollama = new ChatOllama({
   baseUrl: "http://localhost:11434", // Default value
   model: "llama3", // Default value
@@ -64,3 +66,18 @@ export const runPrompt = async (readme:string, folderStructure:string,diff: stri
   const response = await chain.invoke({ diff });
   return response;
 };
+
+async function generateReviewMessage(branch:string) {
+	try {
+		const readme = await readReadmeFile();
+		const diff = await getStagedChangesDiff(branch);
+		const folderStructure = await generateFolderStructureFromGit();
+
+		const response = await runPrompt(readme, folderStructure, diff);
+
+		console.log("Generated Message:\n\n", response);
+	} catch (error) {
+		console.error("Error generating message:", error);
+	}
+}
+export default generateReviewMessage;

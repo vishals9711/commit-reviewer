@@ -9,9 +9,9 @@ const readFile = promisify(fs.readFile);
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 
-const getStagedChangesDiff = async () => {
+const getStagedChangesDiff = async (branch:string): Promise<string> => {
   try {
-    const diff = await git.diff(["--cached"]);
+    const diff = await git.diff([branch]);
     return diff;
   } catch (error) {
     console.error("Error getting staged changes diff:", error);
