@@ -1,5 +1,4 @@
-const PROMPT_KNOWLEDGE_BASED = `Sure, here’s the consolidated information from the Reddit thread on conducting a code review, formatted as a comprehensive guide:
-
+const PROMPT_KNOWLEDGE_BASED = `
 ---
 
 ### How to Conduct a Code Review: A Comprehensive Guide

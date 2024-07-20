@@ -4,22 +4,19 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import PROMPT_KNOWLEDGE_BASED from "./comments";
 import readReadmeFile from "../folderFunctions/readReadme";
 import { getStagedChangesDiff, generateFolderStructureFromGit } from "../folderFunctions/gitUtils";
+
+
 const ollama = new ChatOllama({
-  baseUrl: "http://localhost:11434", // Default value
-  model: "llama3", // Default value
+  baseUrl: "http://localhost:11434", 
+  model: "llama3",
 });
 
 const parser = new StringOutputParser();
 
-
-const KNOWLEDGE_PROMPT = `Here is the consolidated information from the Reddit thread on conducting a code review, formatted as a comprehensive guide:
-${PROMPT_KNOWLEDGE_BASED}
-`;
-
-
 const PROMPT_V1 = 
   `
-You are a code reviewer. You are tasked with reviewing a codebase and providing feedback on its quality, maintainability, and adherence to coding standards.
+You are a code reviewer. 
+You are tasked with reviewing a diff of changes made to a codebase and providing feedback on its quality, maintainability, and adherence to coding standards.
 
 ### Instructions:
 1. **Folder Structure:** The hierarchical structure of files and directories within the repository.
@@ -39,7 +36,7 @@ You are a code reviewer. You are tasked with reviewing a codebase and providing 
 const prompt = ChatPromptTemplate.fromMessages([
   [
     "system",
-    KNOWLEDGE_PROMPT
+    PROMPT_KNOWLEDGE_BASED
   ],
   [
     "system",
