@@ -17,12 +17,10 @@ program
 	.option('-b, --branch <branch>', 'Add branch name to compare current branch with')
 	.parse(process.argv);
 
-// TODO: Add more options
-// Add -b to add branch name to compare current branch with
 const options = program.opts();
 
 const {branch} = options;
 
-console.log("Reviewing code in branch", branch);
+console.log(`Reviewing changes against ${branch} branch`);
 generateReviewMessage(branch);
 
