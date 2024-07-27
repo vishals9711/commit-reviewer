@@ -8,7 +8,7 @@ import { getStagedChangesDiff, generateFolderStructureFromGit } from "../folderF
 
 const ollama = new ChatOllama({
   baseUrl: "http://localhost:11434", 
-  model: "llama3",
+  model: process.env.ollama_model || 'llama3',
 });
 
 const parser = new StringOutputParser();
