@@ -13,7 +13,7 @@ Commit Reviewer is a CLI tool designed to assist with reviewing code changes. It
 To install Commit Reviewer, you need to have Node.js and npm installed on your machine. Then, you can install the tool globally with:
 
 ```cmd
-pnpm install -g reviewer-code
+pnpm install -g commit-reviewer
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ pnpm install -g reviewer-code
 You can start using Commit Reviewer by running the following command in your terminal:
 
 ```cmd
-review-code -b <against-branch>
+commit-reviewer -b <against-branch>
 ```
 
 This will start the tool and it will begin reviewing your staged changes against the specified branch.
