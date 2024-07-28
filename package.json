@@ -1,26 +1,44 @@
 {
   "name": "commit-reviewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "A CLI tool for reviewing commits",
+  "keywords": [
+    "commit",
+    "review",
+    "cli",
+    "git",
+    "code review"
+  ],
+  "homepage": "https://github.com/vishals9711/commit-reviewer",
+  "bugs": {
+    "url": "https://github.com/vishals9711/commit-reviewer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vishals9711/commit-reviewer"
+  },
+  "license": "MIT",
+  "author": "Vishal Sharma <vishalsharma1907@gmail.com>",
   "main": "dist/index.js",
   "bin": {
-    "review-code": "dist/index.js"
+    "commit-reviewer": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
-    "@langchain/community": "^0.2.6",
-    "@langchain/core": "^0.2.6",
-    "commander": "^8.0.0",
+    "@langchain/community": "^0.2.20",
+    "@langchain/core": "^0.2.18",
+    "commander": "^12.1.0",
     "cowsay": "^1.6.0",
     "ignore": "^5.3.1",
-    "langchain": "^0.2.5",
-    "simple-git": "^2.0.0"
+    "langchain": "^0.2.11",
+    "simple-git": "^3.25.0"
   },
   "devDependencies": {
-    "@types/node": "^16.0.0",
+    "@types/node": "^22.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.4"
   }
 }
