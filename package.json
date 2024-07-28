@@ -9,6 +9,9 @@
     "git",
     "code review"
   ],
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/vishals9711/commit-reviewer",
   "bugs": {
     "url": "https://github.com/vishals9711/commit-reviewer/issues"
